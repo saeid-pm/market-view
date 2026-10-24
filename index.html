@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>پنل بازار</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap">
+<style>
+:root {
+  --bg: #eef2f6; --surface: #fbfcfd; --surface2: #f3f6f9; --ink: #0f1724; --ink2: #475467; --muted: #6b7686;
+  --line: rgba(15, 23, 36, 0.10); --line2: rgba(15, 23, 36, 0.18); --accent: #1d5fae; --accent-soft: rgba(29, 95, 174, 0.10);
+  --pos: #0b7a3b; --pos-soft: rgba(11, 122, 59, 0.13); --neg: #c03535; --neg-soft: rgba(192, 53, 53, 0.12);
+  --warn: #9a6200; --warn-soft: rgba(154, 98, 0, 0.12); --chip: #e5ebf2;
+  --font: "Vazirmatn", system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1218; --surface: #161b23; --surface2: #1b222c; --ink: #e9eef5; --ink2: #aab4c3; --muted: #8592a4;
+    --line: rgba(233, 238, 245, 0.10); --line2: rgba(233, 238, 245, 0.20); --accent: #74a9ec; --accent-soft: rgba(116, 169, 236, 0.14);
+    --pos: #3cc274; --pos-soft: rgba(60, 194, 116, 0.16); --neg: #f08080; --neg-soft: rgba(240, 128, 128, 0.15);
+    --warn: #e2ad4a; --warn-soft: rgba(226, 173, 74, 0.15); --chip: #222b37; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1218; --surface: #161b23; --surface2: #1b222c; --ink: #e9eef5; --ink2: #aab4c3; --muted: #8592a4;
+  --line: rgba(233, 238, 245, 0.10); --line2: rgba(233, 238, 245, 0.20); --accent: #74a9ec; --accent-soft: rgba(116, 169, 236, 0.14);
+  --pos: #3cc274; --pos-soft: rgba(60, 194, 116, 0.16); --neg: #f08080; --neg-soft: rgba(240, 128, 128, 0.15);
+  --warn: #e2ad4a; --warn-soft: rgba(226, 173, 74, 0.15); --chip: #222b37; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 14px; line-height: 1.7; padding: 16px 16px 56px; }
+.wrap { max-width: 1680px; margin-inline: auto; display: grid; gap: 14px; }
+h1 { font-size: 21px; margin: 0; font-weight: 800; letter-spacing: -0.2px; }
+h2 { font-size: 15px; margin: 0 0 10px; font-weight: 700; text-wrap: balance; }
+h3 { font-size: 13px; margin: 0 0 8px; font-weight: 700; color: var(--ink2); }
+p { margin: 0; }
+.sub { color: var(--ink2); font-size: 12.5px; }
+.note { color: var(--muted); font-size: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; min-width: 0; }
+.lock { max-width: 420px; margin: 12vh auto 0; display: grid; gap: 12px; }
+input[type=password], input[type=search], select { font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line2); background: var(--surface); color: var(--ink); }
+input[type=password] { inline-size: 100%; padding: 10px 12px; }
+button { font: inherit; cursor: pointer; }
+.btn { font-weight: 700; padding: 10px 14px; border-radius: 8px; border: 0; background: var(--accent); color: #fff; }
+.ghost { background: transparent; color: var(--ink2); border: 1px solid var(--line2); font-weight: 500; padding: 6px 12px; border-radius: 8px; }
+label.chk { display: flex; gap: 8px; align-items: center; color: var(--ink2); font-size: 13px; }
+.err { color: var(--neg); font-size: 13px; min-block-size: 1.4em; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pill { background: var(--chip); border-radius: 999px; padding: 1px 9px; font-size: 11.5px; color: var(--ink2); white-space: nowrap; }
+.pill.pos { background: var(--pos-soft); color: var(--pos); }
+.pill.neg { background: var(--neg-soft); color: var(--neg); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.n { direction: ltr; unicode-bidi: isolate; display: inline-block; font-variant-numeric: tabular-nums; }
+.pos { color: var(--pos); } .neg { color: var(--neg); } .mut { color: var(--muted); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.tile { background: var(--surface2); border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; }
+.tile .k { font-size: 12px; color: var(--ink2); }
+.tile .v { font-size: 19px; font-weight: 800; }
+.tile .s { font-size: 11.5px; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--line2); border-radius: 8px; overflow: hidden; }
+.seg button { background: transparent; border: 0; padding: 6px 11px; color: var(--ink2); font-size: 13px; border-inline-start: 1px solid var(--line); }
+.seg button:first-child { border-inline-start: 0; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; font-weight: 700; }
+.ctl { display: grid; gap: 4px; }
+.ctl > span { font-size: 11.5px; color: var(--muted); }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; inline-size: 100%; font-size: 13px; }
+th, td { padding: 7px 9px; border-block-end: 1px solid var(--line); white-space: nowrap; text-align: start; vertical-align: middle; }
+thead th { color: var(--muted); font-weight: 500; font-size: 11.5px; position: sticky; top: 0; background: var(--surface); z-index: 1; }
+#t th, #t td { padding: 6px 7px; }
+#t thead th { white-space: normal; line-height: 1.35; max-inline-size: 92px; vertical-align: bottom; }
+thead th.s { cursor: pointer; user-select: none; }
+thead th[aria-sort] { color: var(--ink); }
+td.num, th.num { text-align: end; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--surface2); }
+tbody tr.sel { background: var(--accent-soft); }
+.pb { display: inline-grid; gap: 2px; min-inline-size: 48px; justify-items: end; }
+.pb i { display: block; block-size: 3px; border-radius: 2px; inline-size: 46px; background: var(--line); position: relative; overflow: hidden; }
+.pb i b { position: absolute; inset-block: 0; inset-inline-end: 0; border-radius: 2px; }
+.pb.up i b { background: var(--pos); } .pb.dn i b { background: var(--neg); }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+.ladder td, .ladder th { text-align: center; padding: 6px 4px; }
+.ladder td.cur { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 6px; }
+.lc { display: grid; gap: 2px; font-size: 12px; }
+.lc .u { color: var(--pos); } .lc .d { color: var(--neg); }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 13px; }
+.kv > :nth-child(odd) { color: var(--ink2); }
+.tt { font-size: 13px; }
+.tt th, .tt td { padding: 5px 8px; }
+.tt tbody th { white-space: normal; font-weight: 500; color: var(--ink2); text-align: start; }
+.tt thead th { position: static; font-size: 12px; }
+.tt td { text-align: end; font-variant-numeric: tabular-nums; }
+.tt td.fav { font-weight: 700; }
+.ht td, .ht th { font-size: 12.5px; }
+.bins td, .bins th { padding: 4px 8px; font-size: 12.5px; }
+.oth { color: var(--muted); font-size: 11.5px; }
+.be { font-size: 12px; margin-inline-start: 3px; color: var(--ink2); }
+.legend { display: grid; grid-template-columns: minmax(120px, auto) 1fr; gap: 8px 14px; align-items: center; font-size: 12.5px; }
+.legend > :nth-child(odd) { justify-self: start; }
+.legend > :nth-child(even) { color: var(--ink2); }
+.hwin { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.dirL { color: var(--pos); font-weight: 700; } .dirS { color: var(--neg); font-weight: 700; }
+.fx { display: grid; gap: 6px; }
+.fxr { display: grid; grid-template-columns: minmax(130px, 1.3fr) minmax(110px, 1fr) repeat(3, minmax(92px, 1fr)); gap: 8px; align-items: center; font-size: 12.5px; padding-block: 5px; border-block-end: 1px solid var(--line); }
+.fxr.h { color: var(--muted); font-size: 11.5px; }
+.dv { display: grid; gap: 1px; }
+.dv i { direction: ltr; }
+.dv i { position: relative; display: block; block-size: 6px; background: var(--line); border-radius: 3px; }
+.dv i::after { content: ""; position: absolute; inset-block: -2px; inset-inline-start: 50%; inline-size: 1px; background: var(--line2); }
+.dv i b { position: absolute; inset-block: 0; border-radius: 3px; }
+details summary { cursor: pointer; font-weight: 700; }
+details[open] summary { margin-block-end: 8px; }
+.guide p { margin-block: 6px; color: var(--ink2); max-inline-size: 80ch; }
+.empty { color: var(--muted); padding: 10px 0; }
+svg text { font-family: var(--font); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 640px) {
+  body { padding: 12px 12px 48px; }
+  .fxr { grid-template-columns: repeat(3, 1fr); gap: 4px 8px; }
+  .fxr > span:nth-child(-n+2) { grid-column: 1 / -1; }
+  .fxr.h > span:nth-child(-n+2) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="lock" class="card lock" aria-labelledby="lh">
+    <h1 id="lh">پنل بازار</h1>
+    <p class="sub">داده‌های این صفحه رمزنگاری شده‌اند و فقط با رمز عبور، داخل همین مرورگر باز می‌شوند.</p>
+    <form id="f">
+      <div style="display:grid;gap:10px">
+        <input id="pw" type="password" autocomplete="current-password" placeholder="رمز عبور" aria-label="رمز عبور" required>
+        <label class="chk"><input id="rem" type="checkbox" checked> روی این دستگاه به خاطر بسپار</label>
+        <button class="btn" type="submit" id="go">باز کردن</button>
+        <div class="err" id="err" role="alert"></div>
+      </div>
+    </form>
+  </section>
+
+  <div id="app" hidden style="display:grid;gap:14px">
+    <header class="bar">
+      <div><h1>پنل بازار</h1><div class="sub" id="meta"></div></div>
+      <div class="row"><span class="pill" id="live" role="status" aria-live="polite" hidden></span><button class="ghost" id="rf" type="button" title="دریافت کندل‌های تازه از OKX و محاسبه‌ی دوباره">به‌روزرسانی</button><button class="ghost" id="out" type="button">قفل</button></div>
+    </header>
+
+    <section class="card" aria-labelledby="mh">
+      <h2 id="mh">وضعیت بازار</h2>
+      <div class="tiles" id="mkt"></div>
+      <p class="note" id="mktnote" style="margin-top:8px"></p>
+    </section>
+
+    <section class="card">
+      <div class="row" style="gap:14px;align-items:flex-end">
+        <div class="ctl"><span>افق زمانی</span><div class="seg" id="segH" role="group" aria-label="افق زمانی"></div></div>
+        <div class="ctl"><span>اندازه‌ی حرکت</span><div class="seg" id="segL" role="group" aria-label="اندازه‌ی حرکت"></div></div>
+        <div class="ctl"><span>اهرم</span><div class="seg" id="segX" role="group" aria-label="اهرم"></div></div>
+        <div class="ctl"><span>نقدشوندگی</span><select id="tier" aria-label="فیلتر نقدشوندگی"><option value="">همه</option></select></div>
+        <div class="ctl" style="flex:1;min-inline-size:150px"><span>جستجو</span><input id="q" type="search" placeholder="مثلاً SOL" aria-label="جستجوی ارز"></div>
+      </div>
+      <p class="note" id="ctlnote" style="margin-top:10px"></p>
+    </section>
+
+    <section class="card" id="detail" hidden aria-live="polite"></section>
+
+    <section class="card tbl" aria-label="جدول ارزها"><table id="t"><thead></thead><tbody></tbody></table></section>
+
+    <section class="card" aria-labelledby="hh">
+      <div class="hwin"><h2 id="hh" style="margin:0">پیش‌بینی‌های گذشته در برابر واقعیت</h2><div class="seg" id="segW" role="group" aria-label="بازه‌ی سوابق"></div></div>
+      <div id="hist"><p class="empty">بعد از دریافت داده حساب می‌شود…</p></div>
+    </section>
+
+    <section class="card" aria-labelledby="sch">
+      <h2 id="sch">کارنامه‌ی مدل</h2>
+      <div id="score"></div>
+    </section>
+
+    <section class="card" aria-labelledby="lg">
+      <h2 id="lg">راهنمای نمادها و رنگ‌ها</h2>
+      <div class="legend">
+        <span><span class="dirL">لانگ ۵۴٪</span> <span class="oth">شورت ۴۶</span></span><span>ستون جهت: اگر قیمت به یکی از دو سطح برسد، احتمال این‌که اول به این سمت برود. عدد رنگی جهت محتمل‌تر است (سبز لانگ، قرمز شورت)، عدد خاکستری طرف مقابل؛ جمع دو عدد ۱۰۰٪ است. رنگ فقط جهت را نشان می‌دهد، نه سود.</span>
+        <span class="be">●</span><span>بالای سربه‌سر: احتمال جهت از حداقل لازم برای جبران هزینه بیشتر است. سود را تضمین نمی‌کند؛ در آزمون خارج از نمونه به سود واقعی تبدیل نشد.</span>
+        <span class="be">○</span><span>زیر سربه‌سر: احتمال جهت برای جبران هزینه کافی نیست. موس را روی نماد نگه دار تا حداقل لازم را ببینی.</span>
+        <span><span class="n pos">۷</span> از <span class="n">۹</span></span><span>ستون سابقه‌ی جهت (۴۸ ساعت گذشته): ۹ بار قیمت به یکی از دو سطح رسید و ۷ بارش همان جهتی بود که پنل آن ساعت پیش‌بینی کرده بود. سبز یعنی ۶۰٪ یا بیشتر درست، قرمز یعنی ۴۰٪ یا کمتر، خاکستری یعنی کمتر از ۵ مورد و کم‌اعتبار.</span>
+        <span><span class="pb up"><span class="n">۶۰٪</span><i><b style="inline-size:60%"></b></i></span></span><span>نوار زیر عدد: اندازه‌ی احتمال رسیدن به سطح بالا (سبز) یا پایین (قرمز).</span>
+        <span><span class="pill warn">−۳٫۵٪</span></span><span>عدد نارنجی کنار قیمت: قیمت زنده بیش از ۱٪ از قیمت کندلی که احتمال‌ها از آن حساب شده‌اند فاصله گرفته؛ احتمال‌ها برای قیمت فعلی دقیق نیستند.</span>
+        <span><span class="pill warn">داده‌ی کم</span></span><span>تاریخچه‌ی ارز کوتاه است یا آخرین کندلش قدیمی است.</span>
+        <span><span class="pill pos">زنده</span> <span class="pill warn">هشدار</span></span><span>نوار بالای صفحه: سبز یعنی احتمال‌ها با کندل‌های تازه‌ی OKX همین‌جا حساب شده‌اند؛ نارنجی یعنی دریافت تازه ممکن نشد و آخرین محاسبه‌ی سرور نشان داده می‌شود.</span>
+        <span><span class="pos">+۲٫۱٪</span> <span class="neg">−۱٫۴٪</span></span><span>تغییر قیمت: سبز مثبت، قرمز منفی. ستون «تغییر ۲۴ ساعت» با قیمت زنده نسبت به دقیقاً ۲۴ ساعت پیش حساب می‌شود (همان تعریف CoinGecko و صرافی‌ها)؛ برچسب‌های ۱س، ۴س و ۷ روز در جزئیات ارز از کندل‌های بسته‌شده‌اند.</span>
+        <span><span class="pill pos">جهت درست</span> <span class="pill neg">جهت غلط</span></span><span>در سوابق هر ارز: سطحی که اول زده شد همان جهت پیش‌بینی‌شده بود یا نه. «هر دو در یک کندل» یعنی ترتیب معلوم نیست و باخت حساب می‌شود؛ «در جریان» یعنی مدتش هنوز تمام نشده.</span>
+        <span>۱۴٪ ← ۲۵٪</span><span>در بخش سوابق: میانگین پیش‌بینی ← آنچه واقعاً رخ داد.</span>
+        <span><span class="dv" style="inline-size:90px"><i><b style="left:50%;inline-size:30%;background:var(--pos)"></b></i></span></span><span>اثر عامل‌ها: نوار رنگی یعنی اثر از بازه‌ی اطمینان بزرگ‌تر است؛ خاکستری یعنی از نظر آماری قابل تشخیص نیست.</span>
+        <span>نمودار نقطه‌ای</span><span>کارنامه: هر نقطه گروهی از پیش‌بینی‌ها؛ محور افقی احتمال پیش‌بینی‌شده، عمودی آنچه رخ داد. نزدیکی به خط‌چین یعنی احتمال‌ها راست می‌گویند؛ نقطه‌ی بزرگ‌تر یعنی نمونه‌ی بیشتر.</span>
+      </div>
+    </section>
+
+    <section class="card guide">
+      <details>
+        <summary>این اعداد یعنی چه</summary>
+        <p><b>رسیدن به سطح بالا و پایین:</b> احتمال این‌که قیمت در مدت انتخابی حداقل یک بار به آن فاصله بالاتر یا پایین‌تر از قیمت کندل برسد. هر دو می‌توانند هم‌زمان بالا باشند؛ این نشانه‌ی نوسان است، نه جهت. این عدد احتمال برد معامله نیست؛ برد یعنی رسیدن به هدف قبل از حد ضرر، که در جزئیات هر ارز آمده.</p>
+        <p><b>هر دو سطح در یک کندل:</b> اگر قیمت در یک کندل ساعتی هم به هدف و هم به حد ضرر برسد، ترتیبشان معلوم نیست. این حالت (بسته به افق و سطح، ۰٫۱ تا ۴٪ برخوردها) در سود انتظاری و سربه‌سر باخت حساب می‌شود، مثل بک‌تست.</p>
+        <p><b>جهت: لانگ / شورت:</b> اگر یکی از دو سطح زده شود، احتمال این‌که اول سطح بالا زده شود (لانگ) و احتمال این‌که اول سطح پایین زده شود (شورت). جمع این دو همیشه ۱۰۰٪ است؛ «لانگ ۵۰٪ · شورت ۵۰٪» یعنی هیچ ترجیحی نیست. این احتمال برد معامله نیست، چون ممکن است هیچ سطحی زده نشود؛ برد واقعی تقریباً برابر است با «جهت» ضرب در «رسیدن به حداقل یکی». در آزمون، این عدد در افق‌های ۴ تا ۴۸ ساعت قابل اتکا نبود؛ در ۱ ساعت کمی اطلاعات دارد ولی هزینه معمولاً از آن بیشتر است.</p>
+        <p><b>سربه‌سر:</b> با در نظر گرفتن هزینه‌ی معامله، جهت باید حداقل این‌قدر محتمل باشد تا معامله‌ی متقارن (هدف و حد ضرر هم‌اندازه) سود انتظاری مثبت داشته باشد. وقتی برچسب «بالای سربه‌سر» نمایش داده می‌شود که احتمال جهت از این عدد بیشتر باشد. این برچسب یک شرط ریاضی است، نه سیگنال ورود: در آزمون خارج از نمونه (حدود ۲٫۵ سال، ۵۴۴ هزار مورد، هزینه‌ی واقعی هر ارز) معامله‌های دارای این برچسب برای هدف و حد ضرر ۳٪ در ۲۴ ساعت به‌طور میانگین زیان خالص داشتند (لانگ حدود −۰٫۸٪ در هر معامله، شورت حدود ۰٪ با بازه‌ی ±۰٫۱۱٪).</p>
+        <p><b>سود انتظاری:</b> تقریبی است: هدف و حد ضرر به اندازه‌ی سطح انتخابی، خروج در پایان افق اگر هیچ‌کدام زده نشود، با کسر هزینه‌ی تخمینی. با اهرم، روی مارجین ضرب می‌شود؛ اهرم مزیت نمی‌سازد.</p>
+        <p><b>عامل‌ها:</b> برای هر عامل، ارز در کدام بازه است و در ۴ سال گذشته در همان بازه چه اتفاقی افتاده، به صورت تفاوت با میانگین کل و با بازه‌ی اطمینان ۹۵٪. «اثر جهت پایدار» یعنی اثر روی جهت معنادار بوده و در هر دو نیمه‌ی داده (دو نیمه‌ی پنجره‌ی ۴ ساله) هم‌جهت بوده.</p>
+        <p><b>زنده بودن:</b> با باز کردن صفحه یا زدن «به‌روزرسانی»، کندل‌های ساعتی تازه مستقیم از OKX گرفته می‌شود و احتمال‌ها همین‌جا در مرورگر با همان مدل دوباره حساب می‌شود. احتمال‌ها از بسته‌شدن آخرین کندل ساعتی حساب می‌شوند (حداکثر یک ساعت قدیمی)؛ قیمت زنده فقط نمایشی است. فاندینگ، OI و کارنامه از آخرین اجرای سرور می‌آیند (حداکثر ۶ ساعت قبل). اگر OKX از دستگاه تو در دسترس نباشد، همان آخرین محاسبه‌ی سرور نشان داده می‌شود و نوار بالای صفحه هشدار می‌دهد.</p>
+    <p><b>به‌روز ماندن مدل:</b> مدل هر هفته (یکشنبه) با داده‌ی تا همان روز دوباره آموزش می‌بیند؛ پنجره‌ی آموزش ۴ سال اخیر است و هر هفته جلو می‌رود. اگر مدل تازه در آزمون خارج از نمونه بدتر از قبلی باشد جایگزین نمی‌شود. تاریخ داده‌ی مدل بالای صفحه نوشته شده. آزمون نشان داد آموزش فقط با چند ماه اخیر پیش‌بینی را بدتر می‌کند، برای همین پنجره کوتاه‌تر نشده.</p>
+        <p><b>داده‌ی مشتقات:</b> فاندینگ، OI، نسبت لانگ/شورت و taker هنوز سابقه‌ی کافی برای آزمون ندارند و فقط نمایش داده می‌شوند.</p>
+      </details>
+    </section>
+  </div>
+</div>
+<script src="live.js"></script>
+<script>
+(() => {
+  const K = "panel_key_v1";
+  const enc = new TextEncoder(), dec = new TextDecoder();
+  const b64d = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  const b64e = (b) => btoa(String.fromCharCode(...new Uint8Array(b)));
+  const FA = (s) => String(s).replace(/[0-9]/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]).replace(/\./g, "٫").replace(/-/g, "−");
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  let LST = null, HIST = null;
+  let blob = null, D = null, KEY = null, SEED = null, seedAt = 0, srvAt = 0, busy = false, lastLive = 0;
+  const S = { h: 3, l: 1, x: 1, sort: "an", dir: -1, sel: null, ft: "24_3", hw: 336 };
+  const HBACK = 336, HWIN = [[48, "۴۸ ساعت"], [168, "۱ هفته"], [336, "۲ هفته"]];
+  const LEV = [1, 2, 3, 5, 10];
+
+  const store = {
+    get() { try { return JSON.parse(localStorage.getItem(K) || "null"); } catch (e) { return null; } },
+    set(v) { try { localStorage.setItem(K, JSON.stringify(v)); } catch (e) {} },
+    del() { try { localStorage.removeItem(K); } catch (e) {} },
+  };
+  const prefs = {
+    get() { try { return JSON.parse(localStorage.getItem("panel_prefs_v1") || "{}"); } catch (e) { return {}; } },
+    set(v) { try { localStorage.setItem("panel_prefs_v1", JSON.stringify(v)); } catch (e) {} },
+  };
+  async function load() {
+    const r = await fetch("data.enc.json?t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) throw new Error("http " + r.status);
+    return r.json();
+  }
+  async function derive(pw) {
+    const base = await crypto.subtle.importKey("raw", enc.encode(pw), "PBKDF2", false, ["deriveKey"]);
+    return crypto.subtle.deriveKey({ name: "PBKDF2", salt: b64d(blob.salt), iterations: blob.iter, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, true, ["decrypt"]);
+  }
+  async function open(key) {
+    const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64d(blob.iv) }, key, b64d(blob.ct));
+    return JSON.parse(dec.decode(pt));
+  }
+
+  const fin = (v) => v != null && isFinite(v);
+  const num = (v, d) => fin(v) ? `<span class="n">${FA(Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }))}</span>` : "–";
+  function price(v) {
+    if (!fin(v)) return "–";
+    const d = v >= 1000 ? 1 : v >= 100 ? 2 : v >= 1 ? 4 : Math.min(10, Math.max(4, 3 - Math.floor(Math.log10(v))));
+    return `<span class="n">${FA(Number(v).toLocaleString("en-US", { maximumFractionDigits: d }))}</span>`;
+  }
+  function pct(v, d = 1, color = true, sign = true) {
+    if (!fin(v)) return "–";
+    const s = (sign && v > 0 ? "+" : "") + v.toFixed(d) + "٪";
+    return `<span class="n ${color ? (v > 0 ? "pos" : v < 0 ? "neg" : "") : ""}">${FA(s)}</span>`;
+  }
+  const P0 = (p) => fin(p) ? `<span class="n">${FA(Math.round(p * 100))}٪</span>` : "–";
+  function pbar(p, cls) {
+    if (!fin(p)) return "–";
+    return `<span class="pb ${cls}"><span class="n">${FA(Math.round(p * 100))}٪</span><i><b style="inline-size:${Math.round(p * 100)}%"></b></i></span>`;
+  }
+
+  const DRIFT = 1;
+  const drift = (c) => fin(c.px) && fin(c.price) && c.price > 0 ? Math.abs(c.px / c.price - 1) * 100 : 0;
+  const TIE = {"1_2":0.0397,"1_3":0.0272,"1_5":0.022,"1_8":0.0162,"4_2":0.0159,"4_3":0.0086,"4_5":0.0054,"4_8":0.0039,"12_2":0.0103,"12_3":0.0044,"12_5":0.0021,"12_8":0.0013,"24_2":0.009,"24_3":0.0034,"24_5":0.0014,"24_8":0.0007,"48_2":0.0085,"48_3":0.0029,"48_5":0.0011,"48_8":0.0004};
+  function calc(c, h, l) {
+    const Lp = D.grid.L[l], L = Lp / 100, an = c.an[h][l], q = c.q[h][l];
+    const t = an * (TIE[`${D.grid.H[h]}_${Lp}`] || 0), ad = an - t;
+    const pu = q * ad, pd = (1 - q) * ad;
+    const evL = L * (pu - pd - t) - c.cost, evS = L * (pd - pu - t) - c.cost;
+    const qs = ad > 0.01 ? 0.5 + (c.cost / L + t) / (2 * ad) : 1;
+    const side = q >= 0.5 ? "L" : "S", qq = side === "L" ? q : 1 - q;
+    return { L, an, q, pu, pd, t, evL, evS, qs, side, edge: qq > qs, ev: Math.max(evL, evS) };
+  }
+
+  function seg(id, items, cur, on) {
+    $(id).innerHTML = items.map((t, i) => `<button type="button" aria-pressed="${i === cur}" data-i="${i}">${t}</button>`).join("");
+    $(id).onclick = (e) => { const b = e.target.closest("button"); if (!b) return; on(+b.dataset.i); };
+  }
+  function controls() {
+    seg("segH", D.grid.H.map((h) => FA(h) + "س"), S.h, (i) => { S.h = i; save(); renderAll(); });
+    seg("segL", D.grid.L.map((l) => FA(l) + "٪"), S.l, (i) => { S.l = i; save(); renderAll(); });
+    seg("segX", LEV.map((x) => FA(x) + "x"), S.x, (i) => { S.x = i; save(); renderAll(); });
+    const H = D.grid.H[S.h], L = D.grid.L[S.l];
+    $("ctlnote").innerHTML = `هدف و حد ضرر ${FA(L)}٪ در ${FA(H)} ساعت، اهرم ${FA(LEV[S.x])}x. احتمال‌ها از مدل آزموده‌شده روی ۴ سال داده است؛ سود انتظاری تقریبی و پس از کسر هزینه است و در آزمون خارج از نمونه به سود واقعی تبدیل نشده؛ آن را سیگنال ورود ندان. عدد نارنجی کنار قیمت یعنی قیمت زنده از قیمت کندلی که احتمال‌ها از آن حساب شده‌اند بیش از ۱٪ فاصله گرفته.`;
+  }
+  function save() { prefs.set({ h: S.h, l: S.l, x: S.x, sort: S.sort, dir: S.dir, ft: S.ft, hw: S.hw }); }
+
+  function regime() {
+    const m = D.market, F = D.factors.factors;
+    const fbt = F.find((f) => f.key === "btc_trend"), fbr = F.find((f) => f.key === "m_breadth24");
+    const tb = m.fb && m.fb.btc_trend != null ? fbt.bins[m.fb.btc_trend] : null;
+    const bb = m.fb && m.fb.m_breadth24 != null ? fbr.bins[m.fb.m_breadth24] : null;
+    const btc = D.coins.find((c) => c.sym === "BTC");
+    const hi = D.grid.H.indexOf(24), li = D.grid.L.indexOf(3);
+    const tiles = [
+      ["روند بیت‌کوین", tb ? tb.name : "–", `انحراف از میانگین ۵۰ روزه: ${num(m.btc_trend, 2)} واحد نوسان`],
+      ["ارزهای مثبت در ۲۴ ساعت", fin(m.m_breadth24) ? `<span class="n">${FA(Math.round(m.m_breadth24 * 100))}٪</span>` : "–", "پهنای بازار"],
+      ["بالای میانگین ۲۰۰ ساعته", fin(m.m_breadth200) ? `<span class="n">${FA(Math.round(m.m_breadth200 * 100))}٪</span>` : "–", "سهم ارزها در روند کوتاه‌مدت صعودی"],
+      ["نوسان بازار", fin(m.vol_pct) ? `صدک <span class="n">${FA(m.vol_pct)}</span>` : "–", "نسبت به ۴ سال گذشته (۱۰۰ = پرنوسان‌ترین)"],
+    ];
+    if (btc && hi >= 0 && li >= 0) tiles.push(["بیت‌کوین ۳٪ در ۲۴ ساعت", `<span class="pos">بالا ${P0(btc.up[hi][li])}</span> · <span class="neg">پایین ${P0(btc.dn[hi][li])}</span>`, "احتمال رسیدن قیمت به ۳٪ بالاتر / پایین‌تر"]);
+    $("mkt").innerHTML = tiles.map(([k, v, s]) => `<div class="tile"><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></div>`).join("");
+    const parts = [];
+    for (const [b, nm] of [[tb, "این روند بیت‌کوین"], [bb, "این پهنای بازار"]]) {
+      if (!b || !b.t.uf_24_3) continue;
+      const u = b.t.uf_24_3;
+      parts.push(`در ${nm}، طی ۴ سال گذشته ${FA(Math.round(u[0] * 100))}٪ ± ${FA(Math.round(u[1] * 100))} مواقع حرکت ۳٪ اول به سمت بالا بوده (میانگین کل ${FA(Math.round(D.factors.base.uf_24_3[0] * 100))}٪).`);
+    }
+    $("mktnote").textContent = parts.join(" ");
+  }
+
+  const COLS = [
+    ["sym", "ارز", false], ["price", "قیمت", true], ["chg24", "تغییر ۲۴ ساعت", true], ["vol24", "نوسان روزانه", true],
+    ["up", "رسیدن به سطح بالا", true], ["dn", "رسیدن به سطح پایین", true], ["an", "رسیدن به حداقل یکی", true],
+    ["dir", "جهت: لانگ / شورت", true], ["rec", "سابقه‌ی جهت ۴۸س", true], ["ev", "سود انتظاری (مارجین)", true], ["cost", "هزینه (مارجین)", true],
+    ["funding", "فاندینگ", true], ["oi", "تغییر OI ۲۴س", true],
+  ];
+  function val(c, k) {
+    const h = S.h, l = S.l;
+    switch (k) {
+      case "up": return c.up[h][l]; case "dn": return c.dn[h][l]; case "an": return c.an[h][l]; case "q": return c.q[h][l]; case "dir": { const q = c.q[h][l]; return fin(q) ? Math.max(q, 1 - q) : null; }
+      case "rec": { const r = recOf(c.sym); return r && r.n ? (r.ok + 1) / (r.n + 2) : null; }
+      case "ev": return calc(c, h, l).ev; case "funding": return c.d.funding; case "oi": return c.d.oi_chg24;
+      default: return c[k];
+    }
+  }
+  const HT = {
+    up: "درصد احتمال این‌که قیمت تا پایان افق حداقل یک بار به این فاصله بالاتر برسد، مستقل از سطح پایین. این احتمال برد معامله نیست؛ برد و باخت در جزئیات هر ارز است.",
+    dn: "درصد احتمال این‌که قیمت تا پایان افق حداقل یک بار به این فاصله پایین‌تر برسد، مستقل از سطح بالا. این احتمال برد معامله نیست.",
+    rec: "سابقه‌ی جهت در ۴۸ ساعت گذشته برای همین افق و فاصله: «۷ از ۹» یعنی ۹ بار قیمت به یکی از دو سطح رسید و ۷ بارش همان جهتی بود که پنل پیش‌بینی کرده بود. کمتر از ۵ مورد خاکستری است.",
+    an: "درصد احتمال این‌که تا پایان افق حداقل یکی از دو سطح بالا یا پایین زده شود. بقیه‌اش یعنی قیمت بین دو سطح می‌ماند و معامله بی‌نتیجه است.",
+    cost: "هزینه‌ی رفت‌وبرگشت تخمینی (کارمزد و لغزش) ضرب در اهرم، یعنی درصدی از مارجین.",
+    q: "اگر یکی از دو سطح زده شود، احتمال این‌که اول سطح بالا زده شود.",
+    dir: "اگر یکی از دو سطح زده شود، با چه احتمالی اول سطح بالا زده می‌شود (لانگ) و با چه احتمالی اول سطح پایین (شورت). جمع این دو همیشه ۱۰۰٪ است؛ ۵۰/۵۰ یعنی هیچ جهتی ترجیح ندارد. رنگ فقط جهت قوی‌تر را نشان می‌دهد، نه سود.",
+    ev: "سود انتظاری طرف بهتر (لانگ یا شورت) پس از کسر هزینه، درصدی از مارجین. تقریبی است و در آزمون خارج از نمونه به سود واقعی تبدیل نشده.",
+  };
+  function dirCompact(q, r) {
+    if (!fin(q)) return "–";
+    const a = Math.round(q * 100), b = 100 - a;
+    const sym = !r ? "" : r.edge
+      ? ` <span class="be" title="بالای سربه‌سر: احتمال این جهت از حداقل لازم برای جبران هزینه (${FA(Math.round(r.qs * 100))}٪) بیشتر است؛ سود تضمین نیست.">●</span>`
+      : ` <span class="be mut" title="زیر سربه‌سر: حداقل لازم برای جبران هزینه ${fin(r.qs) && r.qs < 1 ? FA(Math.round(r.qs * 100)) + "٪" : "–"}">○</span>`;
+    if (a === b) return `<span class="mut">لانگ ۵۰ · شورت ۵۰</span>${sym}`;
+    const main = a > b ? `<span class="dirL">لانگ ${FA(a)}٪</span>` : `<span class="dirS">شورت ${FA(b)}٪</span>`;
+    return `${main} <span class="oth">${a > b ? "شورت" : "لانگ"} ${FA(a > b ? b : a)}</span>${sym}`;
+  }
+  function recCell(sym) {
+    if (!HIST) return '<span class="mut">…</span>';
+    const r = recOf(sym);
+    if (!r || !r.n) return '<span class="mut" title="در ۴۸ ساعت گذشته قیمت به هیچ‌کدام از دو سطح نرسید.">–</span>';
+    const pc = r.ok / r.n, weak = r.n < 5;
+    const cls = weak ? "mut" : pc >= 0.6 ? "pos" : pc <= 0.4 ? "neg" : "";
+    return `<span class="${cls}" title="۴۸ ساعت گذشته: ${FA(r.n)} بار یکی از دو سطح زده شد، ${FA(r.ok)} بار جهت درست بود${r.tie ? ` (${FA(r.tie)} بار هر دو در یک کندل)` : ""}."><span class="n">${FA(r.ok)}</span> از <span class="n">${FA(r.n)}</span></span>`;
+  }
+  function dirCell(q) {
+    if (!fin(q)) return "–";
+    const a = Math.round(q * 100), b = 100 - a;
+    if (a === b) return `<span class="mut">لانگ ${FA(a)}٪ · شورت ${FA(b)}٪</span>`;
+    const l = `<span class="${a > b ? "dirL" : "mut"}">لانگ ${FA(a)}٪</span>`, sh = `<span class="${b > a ? "dirS" : "mut"}">شورت ${FA(b)}٪</span>`;
+    return `${l} · ${sh}`;
+  }
+  function table() {
+    const L = D.grid.L[S.l];
+    const thead = $("t").tHead;
+    thead.innerHTML = "<tr>" + COLS.map(([k, l, n]) => {
+      const lab = k === "up" ? `رسیدن به ${FA(L)}٪ بالاتر` : k === "dn" ? `رسیدن به ${FA(L)}٪ پایین‌تر` : l;
+      const cur = k === S.sort;
+      const tip = HT[k] ? ` title="${HT[k]}"` : "";
+      return `<th class="s ${n ? "num" : ""}" data-k="${k}"${tip} tabindex="0" ${cur ? `aria-sort="${S.dir < 0 ? "descending" : "ascending"}"` : ""}>${lab}${cur ? (S.dir < 0 ? " ▾" : " ▴") : ""}</th>`;
+    }).join("") + "</tr>";
+    const qtxt = $("q").value.trim().toUpperCase(), tier = $("tier").value, X = LEV[S.x];
+    const rows = D.coins.filter((c) => (!qtxt || c.sym.includes(qtxt)) && (!tier || c.tier === tier)).sort((a, b) => {
+      if (S.sort === "sym") return S.dir * a.sym.localeCompare(b.sym);
+      const x = val(a, S.sort), y = val(b, S.sort);
+      return S.dir * ((fin(x) ? x : -1e9) - (fin(y) ? y : -1e9));
+    });
+    $("t").tBodies[0].innerHTML = rows.map((c) => {
+      const r = calc(c, S.h, S.l);
+      const low = c.n_hist < 400 || c.stale;
+      const evv = r.ev * X * 100;
+      return `<tr data-s="${esc(c.sym)}" class="${S.sel === c.sym ? "sel" : ""}" tabindex="0">
+        <td><b>${esc(c.sym)}</b> ${low ? '<span class="pill warn">داده‌ی کم</span>' : ""}</td>
+        <td class="num">${price(fin(c.px) ? c.px : c.price)}${drift(c) >= DRIFT ? ` <span class="pill warn" title="قیمت زنده از قیمت پایانی آخرین کندل فاصله گرفته؛ احتمال‌های این ردیف برای قیمت فعلی دقیق نیستند.">${pct((c.px / c.price - 1) * 100, 1, false)}</span>` : ""}</td>
+        <td class="num"${c.chg24live ? ` title="قیمت زنده نسبت به دقیقاً ۲۴ ساعت پیش (مثل CoinGecko). از روی کندل‌های بسته‌شده: ${fin(c.chg24c) ? FA((c.chg24c > 0 ? "+" : "") + c.chg24c.toFixed(1)) + "٪" : "–"}"` : ""}>${pct(c.chg24)}</td>
+        <td class="num">${pct(c.vol24, 1, false, false)}</td>
+        <td class="num">${pbar(c.up[S.h][S.l], "up")}</td>
+        <td class="num">${pbar(c.dn[S.h][S.l], "dn")}</td>
+        <td class="num">${P0(r.an)}</td>
+        <td class="num">${dirCompact(r.q, r)}</td>
+        <td class="num">${recCell(c.sym)}</td>
+        <td class="num">${fin(evv) ? `<span class="n ${evv > 0 ? "" : "mut"}" title="سود انتظاری طرف ${r.evL >= r.evS ? "لانگ" : "شورت"}">${FA((evv > 0 ? "+" : "") + evv.toFixed(2))}٪</span>` : "–"}</td>
+        <td class="num">${pct(c.cost * 100 * X, 2, false, false)}</td>
+        <td class="num">${fin(c.d.funding) ? pct(c.d.funding, 3, false) : "–"}</td>
+        <td class="num">${pct(c.d.oi_chg24)}</td>
+      </tr>`;
+    }).join("") || `<tr><td colspan="${COLS.length}" class="empty">ارزی با این فیلتر نیست.</td></tr>`;
+  }
+
+  function divbar(d, ci, scale) {
+    if (!fin(d)) return "<span class='mut'>–</span>";
+    const w = Math.min(50, Math.abs(d) / scale * 50);
+    const side = d >= 0 ? `left:50%` : `right:50%`;
+    const sig = fin(ci) && Math.abs(d) > ci;
+    const col = !sig ? "var(--line2)" : d >= 0 ? "var(--pos)" : "var(--neg)";
+    return `<span class="dv"><span class="n" style="font-size:12px">${FA((d > 0 ? "+" : "") + (d * 100).toFixed(1))}${fin(ci) ? ` <span class="mut">±${FA((ci * 100).toFixed(1))}</span>` : ""}</span><i><b style="${side};inline-size:${w}%;background:${col}"></b></i></span>`;
+  }
+
+  function detail() {
+    const box = $("detail");
+    const c = D.coins.find((x) => x.sym === S.sel);
+    if (!c) { box.hidden = true; return; }
+    box.hidden = false;
+    const H = D.grid.H, L = D.grid.L, X = LEV[S.x], r = calc(c, S.h, S.l);
+    const lad = `<table class="ladder"><thead><tr><th>فاصله \\ مدت</th>${H.map((h) => `<th>${FA(h)}س</th>`).join("")}</tr></thead><tbody>${L.map((l, j) => `<tr><th>${FA(l)}٪</th>${H.map((h, i) => `<td class="${i === S.h && j === S.l ? "cur" : ""}" data-h="${i}" data-l="${j}" style="cursor:pointer"><span class="lc"><span class="u">بالا ${FA(Math.round(c.up[i][j] * 100))}٪</span><span class="d">پایین ${FA(Math.round(c.dn[i][j] * 100))}٪</span></span></td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    const liq = Math.max(0, 1 / X - 0.005) * 100;
+    const fv = r.side === "L" ? 0 : 1;
+    const row = (k, a, b, both) => `<tr><th>${k}</th><td class="${fv === 0 ? "fav" : ""}">${a}</td><td class="${fv === 1 ? "fav" : ""}">${both ? a : b}</td></tr>`;
+    const trade = `<table class="tt"><thead><tr><th></th><th class="num"><span class="dirL">لانگ</span></th><th class="num"><span class="dirS">شورت</span></th></tr></thead><tbody>
+      ${row(`لمس هدف تا پایان افق (هر زمان)`, P0(c.up[S.h][S.l]), P0(c.dn[S.h][S.l]))}
+      ${row(`برد: هدف قبل از حد ضرر`, P0(r.pu), P0(r.pd))}
+      ${row(`باخت: حد ضرر اول، یا هر دو در یک کندل`, P0(r.pd + r.t), P0(r.pu + r.t))}
+      ${row(`هیچ‌کدام تا پایان افق`, P0(1 - r.an), "", true)}
+      ${row(`احتمال جهت`, P0(r.q), P0(1 - r.q))}
+      ${row(`حداقل احتمال جهت برای سربه‌سر`, fin(r.qs) && r.qs < 1 ? P0(r.qs) : "–", "", true)}
+      ${row(`سود انتظاری (تقریبی، روی مارجین)`, pct(r.evL * 100 * X, 2, false), pct(r.evS * 100 * X, 2, false))}
+      ${row(`اگر هدف بخورد (مارجین)`, pct((r.L - c.cost) * 100 * X, 1, false), "", true)}
+      ${row(`اگر حد ضرر بخورد (مارجین)`, pct(-(r.L + c.cost) * 100 * X, 1, false), "", true)}
+      ${row(`هزینه‌ی رفت‌وبرگشت (مارجین)`, pct(c.cost * 100 * X, 2, false, false), "", true)}
+      ${row(`فاصله‌ی تقریبی تا لیکویید`, X > 1 ? pct(liq, 1, false, false) : "بدون اهرم", "", true)}
+    </tbody></table>
+    <p class="note" style="margin-top:6px">هزینه روی قیمت ${pct(c.cost * 100, 2, false, false)} است و با اهرم ${FA(X)}x روی مارجین ${FA(X)} برابر می‌شود. ستون پررنگ، جهت محتمل‌تر است.</p>${X > 1 && L[S.l] >= liq ? `<p class="pill neg" style="margin-top:8px">حد ضرر ${FA(L[S.l])}٪ از فاصله‌ی لیکویید بیشتر است</p>` : ""}`;
+    const F = D.factors, tg = S.ft, base = F.base;
+    const bu = base["up_" + tg], bd = base["dn_" + tg], bf = base["uf_" + tg];
+    const rows = F.factors.map((f, k) => {
+      const bi = c.fb[k];
+      if (bi == null) return `<div class="fxr"><span>${f.label}</span><span class="mut">داده‌ی کافی نیست</span><span></span><span class="opt"></span><span class="opt"></span></div>`;
+      const b = f.bins[bi], tu = b.t["up_" + tg], td = b.t["dn_" + tg], tf = b.t["uf_" + tg], hh = b.t["uf_" + tg + "_h"];
+      const sigf = tf && Math.abs(tf[0] - bf[0]) > tf[1];
+      const st = sigf && hh && fin(hh[0]) && fin(hh[1]) ? ((hh[0] - bf[0]) * (hh[1] - bf[0]) > 0 ? "اثر جهت پایدار" : "اثر جهت ناپایدار") : "";
+      return `<div class="fxr"><span>${f.label}</span><span><b>${b.name}</b>${st ? ` <span class="pill ${st === "اثر جهت پایدار" ? "" : "warn"}">${st}</span>` : ""}</span>
+        <span>${tu ? divbar(tu[0] - bu[0], tu[1], 0.2) : "–"}</span>
+        <span class="opt">${td ? divbar(td[0] - bd[0], td[1], 0.2) : "–"}</span>
+        <span class="opt">${tf ? divbar(tf[0] - bf[0], tf[1], 0.12) : "–"}</span></div>`;
+    }).join("");
+    const ftH = tg === "24_3" ? "۳٪ در ۲۴ ساعت" : "۲٪ در ۴ ساعت";
+    const fx = `<div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0">اثر هر عامل (تفاوت با میانگین ۴ ساله، واحد: درصد)</h3>
+      <div class="seg" id="segF"><button type="button" aria-pressed="${tg === "24_3"}" data-v="24_3">۳٪ / ۲۴س</button><button type="button" aria-pressed="${tg === "4_2"}" data-v="4_2">۲٪ / ۴س</button></div></div>
+      <div class="fx"><div class="fxr h"><span>عامل</span><span>وضعیت فعلی این ارز</span><span>رسیدن به بالا</span><span class="opt">رسیدن به پایین</span><span class="opt">اول بالا (لانگ)</span></div>${rows}</div>
+      <p class="note" style="margin-top:6px">نوار رنگی یعنی اثر از بازه‌ی اطمینان بزرگ‌تر است؛ نوار خاکستری یعنی از نظر آماری قابل تشخیص نیست. میانگین کل برای ${ftH}: رسیدن به بالا ${P0(bu[0])}، رسیدن به پایین ${P0(bd[0])}، اول بالا (لانگ) ${P0(bf[0])}. اثرها جدا جدا اندازه گرفته شده‌اند و جمع‌پذیر نیستند؛ عدد ترکیبی همان احتمال مدل است.</p>`;
+    const d = c.d || {};
+    const der = `<div class="kv">
+      <span>فاندینگ</span><span>${fin(d.funding) ? pct(d.funding, 4, false) : "–"}</span>
+      <span>OI</span><span>${fin(d.oi) ? num(d.oi / 1e6, 1) + " میلیون $" : "–"}</span>
+      <span>تغییر OI در ۲۴ ساعت</span><span>${pct(d.oi_chg24)}</span>
+      <span>نسبت حساب‌های لانگ به شورت</span><span>${num(d.ls_acct, 2)}</span>
+      <span>نسبت پوزیشن بزرگ‌ها</span><span>${num(d.top_pos, 2)}</span>
+      <span>سهم خرید taker (ساعت آخر)</span><span>${fin(d.taker) ? P0(d.taker) : "–"}</span>
+    </div><p class="note" style="margin-top:6px">این داده‌ها هنوز سابقه‌ی کافی برای آزمون ندارند و در احتمال‌ها اثری ندارند.</p>`;
+    box.innerHTML = `<div class="bar" style="margin-bottom:10px"><div class="row"><h2 style="margin:0">${esc(c.sym)}</h2><span>${price(fin(c.px) ? c.px : c.price)}</span>${fin(c.px) ? `<span class="pill${drift(c) >= DRIFT ? " warn" : ""}" title="تغییر قیمت زنده نسبت به قیمت پایانی آخرین کندل ساعتی. احتمال‌ها از همان کندل حساب شده‌اند.">${pct((c.px / c.price - 1) * 100, 2)} از کندل</span>` : ""}
+        <span class="pill">۱س ${pct(c.chg1)}</span><span class="pill">۴س ${pct(c.chg4)}</span><span class="pill">۲۴س ${pct(c.chg24)}</span><span class="pill">۷ روز ${pct(c.chg168)}</span>
+        <span class="pill">${esc(c.tier)}</span>${c.n_hist < 400 ? '<span class="pill warn">تاریخچه‌ی کوتاه؛ عامل‌ها ناقص</span>' : ""}${c.stale ? '<span class="pill warn">کندل آخر قدیمی است</span>' : ""}</div>
+        <button class="ghost" type="button" id="close">بستن</button></div>
+      ${drift(c) >= DRIFT ? `<p class="pill warn" style="display:inline-block;white-space:normal;margin-bottom:10px">قیمت زنده ${pct((c.px / c.price - 1) * 100, 1, false)} با قیمت پایانی کندل فاصله دارد. همه‌ی احتمال‌های زیر از همان قیمت کندل حساب شده‌اند و برای قیمت فعلی دقیق نیستند؛ تا کندل بعدی صبر کن یا با احتیاط بخوان.</p>` : ""}
+      <div class="grid2">
+        <div><h3>احتمال رسیدن قیمت به هر فاصله، تا پایان هر مدت</h3><div class="tbl">${lad}</div><p class="note">«بالا ۵۳٪» یعنی ۵۳٪ احتمال دارد قیمت در آن مدت حداقل یک بار به این فاصله بالاتر از قیمت کندل برسد؛ «پایین» برای پایین‌تر. هر دو می‌توانند رخ دهند. روی هر خانه بزن تا مدت و فاصله عوض شود.</p></div>
+        <div><h3>معامله با هدف و حد ضرر ${FA(L[S.l])}٪ در ${FA(H[S.h])} ساعت، اهرم ${FA(X)}x</h3>${trade}</div>
+      </div>
+      <div style="margin-top:14px"><h3>پیش‌بینی‌های گذشته‌ی این ارز (${FA(L[S.l])}٪ در ${FA(H[S.h])} ساعت) و آنچه واقعاً شد</h3>${histCoin(c.sym)}</div>
+      <div style="margin-top:14px">${fx}</div>
+      <div style="margin-top:14px"><h3>مشتقات</h3>${der}</div>`;
+    $("close").onclick = () => { S.sel = null; renderAll(); };
+    box.querySelector(".ladder").onclick = (e) => { const td = e.target.closest("td[data-h]"); if (!td) return; S.h = +td.dataset.h; S.l = +td.dataset.l; save(); renderAll(); };
+    $("segF").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; S.ft = b.dataset.v; save(); detail(); };
+  }
+
+  function relchart(rel, title, withNote = true) {
+    if (!rel || !rel.length) return `<p class="empty">${title}: هنوز داده‌ی کافی نیست.</p>`;
+    const W = 260, Hh = 170, pad = 28;
+    const x = (v) => pad + v * (W - pad - 8), y = (v) => Hh - pad - v * (Hh - pad - 8);
+    const maxn = Math.max(...rel.map((r) => r[2]));
+    const pts = rel.map((r) => `<circle cx="${x(r[0]).toFixed(1)}" cy="${y(r[1]).toFixed(1)}" r="${(3 + 4 * Math.sqrt(r[2] / maxn)).toFixed(1)}" fill="var(--accent)" fill-opacity="0.75" stroke="var(--surface)" stroke-width="2"><title>پیش‌بینی ${Math.round(r[0] * 100)}٪ ← واقعی ${Math.round(r[1] * 100)}٪ (${r[2]} نمونه)</title></circle>`).join("");
+    const ticks = [0, 0.5, 1].map((v) => `<text x="${x(v)}" y="${Hh - 8}" font-size="10" fill="var(--muted)" text-anchor="middle">${FA(v * 100)}</text><text x="${pad - 6}" y="${y(v) + 3}" font-size="10" fill="var(--muted)" text-anchor="end">${FA(v * 100)}</text>`).join("");
+    return `<figure style="margin:0"><figcaption class="note">${title}</figcaption><svg viewBox="0 0 ${W} ${Hh}" width="100%" style="max-inline-size:${W}px" role="img" aria-label="${title}" direction="ltr">
+      <line x1="${x(0)}" y1="${y(0)}" x2="${x(1)}" y2="${y(1)}" stroke="var(--line2)" stroke-dasharray="3 3"/>
+      <line x1="${x(0)}" y1="${y(0)}" x2="${x(1)}" y2="${y(0)}" stroke="var(--line2)"/><line x1="${x(0)}" y1="${y(0)}" x2="${x(0)}" y2="${y(1)}" stroke="var(--line2)"/>
+      ${ticks}${pts}</svg>${withNote ? '<p class="note">محور افقی: احتمال پیش‌بینی‌شده، عمودی: آنچه واقعاً رخ داد. نزدیکی نقطه‌ها به خط‌چین یعنی احتمال‌ها راست می‌گویند.</p>' : ""}</figure>`;
+  }
+  function score() {
+    const H = D.grid.H[S.h], L = D.grid.L[S.l], k = `${H}_${L}`, M = D.model.targets;
+    const g = (s) => M[`${s}_${k}`] || {};
+    const fmt = (v) => fin(v) ? `<span class="n">${FA(v.toFixed(3))}</span>` : "–";
+    const row = (s, nm) => `<span>${nm}</span><span>مهارت ${fmt(g(s).bss)} · AUC ${fmt(g(s).auc)}</span>`;
+    const live = D.score && D.score[k];
+    let liveHtml;
+    if (!live) liveHtml = `<p class="empty">کارنامه‌ی زنده فقط برای ۲٪/۴س، ۳٪/۱۲س، ۳٪/۲۴س، ۵٪/۲۴س و ۵٪/۴۸س نگه داشته می‌شود.</p>`;
+    else if (!live.up || !live.up.rel) liveHtml = `<p class="empty">هنوز پیش‌بینی ارزیابی‌شده‌ی کافی نیست (${FA(live.n || 0)} مورد). بعد از چند روز اجرا پر می‌شود.</p>`;
+    else liveHtml = `<div class="kv"><span>پیش‌بینی‌های ارزیابی‌شده</span><span>${num(live.n, 0)}</span>
+        <span>مهارت رسیدن به بالا / پایین</span><span>${fmt(live.up.bss)} / ${fmt(live.dn.bss)}</span>
+        <span>مهارت جهت</span><span>${fmt(live.uf && live.uf.bss)}</span></div>${relchart(live.up.rel, "زنده: رسیدن به بالا")}`;
+    $("score").innerHTML = `<div class="grid2"><div><h3>آزمون خارج از نمونه (${valYears()}) برای ${FA(L)}٪ در ${FA(H)} ساعت</h3>
+        <div class="kv">${row("up", "رسیدن به بالا")}${row("dn", "رسیدن به پایین")}${row("an", "رسیدن به حداقل یکی")}${row("uf", "جهت (اول بالا، لانگ)")}</div>
+        <p class="note" style="margin-top:6px">مهارت (Brier skill) صفر یعنی هم‌اندازه‌ی حدس با میانگین تاریخی، مثبت یعنی بهتر. AUC برابر ۰٫۵ یعنی شیر یا خط.</p></div>
+        <div><h3>کارنامه‌ی زنده</h3>${liveHtml}</div></div>
+      <div class="grid2" style="margin-top:14px">
+        <div><h3>آزمون: رسیدن به بالا</h3>${relchart(g("up").rel, "رسیدن به بالا", false)}</div>
+        <div><h3>آزمون: جهت (اول بالا، لانگ)</h3>${relchart(g("uf").rel, "جهت، پیش از واسنجی", false)}</div>
+      </div>
+      <p class="note" style="margin-top:6px">در هر نمودار: محور افقی احتمال پیش‌بینی‌شده، عمودی آنچه واقعاً رخ داد؛ نزدیکی نقطه‌ها به خط‌چین یعنی احتمال‌ها راست می‌گویند. نمودار جهت پیش از واسنجی است؛ واسنجی بعدی این احتمال‌ها را به سمت ۵۰٪ جمع می‌کند، چون مدل خام در جهت بیش از حد مطمئن بود.</p>`;
+  }
+
+
+  /* ---------- سوابق: پیش‌بینی‌های گذشته در برابر واقعیت ---------- */
+  const tfd = (ms) => FA(new Date(ms).toLocaleString("en-GB", { timeZone: "Asia/Tehran", hour12: false, day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }));
+  let HST = null, HBUILD = 0, HPROG = 0, HCACHE = {};
+  function buildHist() {
+    if (!LST || !window.Live || !window.Live.historyInit) return;
+    const id = ++HBUILD, st = LST;
+    let ctx;
+    try { ctx = window.Live.historyInit(st); } catch (e) { return; }
+    const last = st.n - 1, from = Math.max(0, last - HBACK), out = [];
+    let t = from;
+    const step = () => {
+      if (id !== HBUILD) return;
+      const t0 = performance.now();
+      try {
+        while (t <= last && performance.now() - t0 < 25) { out.push(window.Live.snapshot(st, ctx, t)); t++; }
+      } catch (e) { return; }
+      if (t <= last) {
+        HPROG = (t - from) / (last - from + 1);
+        if (!HIST) hist();
+        setTimeout(step, 0);
+      } else {
+        HIST = out; HST = st; HCACHE = {}; HPROG = 1;
+        hist(); table();
+        if (S.sel) detail();
+      }
+    };
+    setTimeout(step, 0);
+  }
+  function stats(h, l, win) {
+    const key = `${h}_${l}_${win}`;
+    if (HCACHE[key]) return HCACHE[key];
+    const H = D.grid.H[h], Lp = D.grid.L[l];
+    const cost = {};
+    for (const c of D.coins) cost[c.sym] = c.cost;
+    const lastTs = HIST[HIST.length - 1].ts, minTs = lastTs - (win - 1) * 3600000;
+    const r = { n: 0, pu: 0, yu: 0, pd: 0, yd: 0, pn: 0, yn: 0, dirN: 0, dirOk: 0, tie: 0, tr: [], bins: [[0, 0], [0, 0], [0, 0], [0, 0]], coins: {} };
+    for (const sn of HIST) {
+      if (sn.ts < minTs) continue;
+      for (const s in sn.coins) {
+        const p = sn.coins[s], o = window.Live.outcome(HST, s, sn.t, H, Lp);
+        if (!o) continue;
+        const cs = r.coins[s] || (r.coins[s] = { n: 0, ok: 0, tie: 0, done: 0, pu: 0, yu: 0, pd: 0, yd: 0 });
+        const q = p.q[h][l], fav = q >= 0.5 ? "up" : "dn", str = Math.max(q, 1 - q);
+        if (o.first === "up" || o.first === "dn") {
+          const ok = o.first === fav, b = str < 0.52 ? 0 : str < 0.55 ? 1 : str < 0.6 ? 2 : 3;
+          r.dirN++; r.bins[b][0]++; cs.n++;
+          if (ok) { r.dirOk++; r.bins[b][1]++; cs.ok++; }
+        }
+        if (o.first === "tie") { r.tie++; cs.tie++; cs.n++; }
+        if (!o.done) continue;
+        r.n++; cs.done++;
+        r.pu += p.up[h][l]; r.yu += o.upHit ? 1 : 0; cs.pu += p.up[h][l]; cs.yu += o.upHit ? 1 : 0;
+        r.pd += p.dn[h][l]; r.yd += o.dnHit ? 1 : 0; cs.pd += p.dn[h][l]; cs.yd += o.dnHit ? 1 : 0;
+        r.pn += 1 - p.an[h][l]; r.yn += !o.upHit && !o.dnHit ? 1 : 0;
+        const sg = fav === "up" ? 1 : -1;
+        const g = o.first === "up" ? sg * Lp : o.first === "dn" ? -sg * Lp : o.first === "tie" ? -Lp : sg * (o.ret || 0);
+        r.tr.push(g - (cost[s] != null ? cost[s] : 0.006) * 100);
+      }
+    }
+    HCACHE[key] = r;
+    return r;
+  }
+  function recOf(sym) {
+    if (!HIST || !HST || !D) return null;
+    return stats(S.h, S.l, 48).coins[sym] || null;
+  }
+  function hist() {
+    const box = $("hist");
+    if (!box || !D) return;
+    seg("segW", HWIN.map((w) => w[1]), Math.max(0, HWIN.findIndex((w) => w[0] === S.hw)), (i) => { S.hw = HWIN[i][0]; save(); hist(); });
+    if (!HIST || !HST) { box.innerHTML = `<p class="empty">در حال ساختن سوابق… ${HPROG ? FA(Math.round(HPROG * 100)) + "٪" : ""}</p>`; return; }
+    const H = D.grid.H[S.h], Lp = D.grid.L[S.l], r = stats(S.h, S.l, S.hw);
+    const wname = (HWIN.find((w) => w[0] === S.hw) || HWIN[2])[1];
+    const P1 = (x) => fin(x) ? `<span class="n">${FA(Math.round(x * 100))}٪</span>` : "–";
+    const tm = r.tr.length ? r.tr.reduce((a, b) => a + b, 0) / r.tr.length : null;
+    const tw = r.tr.length ? r.tr.filter((x) => x > 0).length / r.tr.length : null;
+    const names = ["۵۰ تا ۵۲٪", "۵۲ تا ۵۵٪", "۵۵ تا ۶۰٪", "۶۰٪ و بیشتر"];
+    const tiles = [
+      ["جهت درست درآمد", r.dirN ? P1(r.dirOk / r.dirN) : "–", `از ${FA(r.dirN)} بار که یکی از دو سطح زده شد؛ ۵۰٪ یعنی مثل شیر یا خط`],
+      [`رسیدن به ${FA(Lp)}٪ بالاتر`, r.n ? `${P1(r.pu / r.n)} ← ${P1(r.yu / r.n)}` : "–", "میانگین پیش‌بینی ← آنچه واقعاً شد"],
+      [`رسیدن به ${FA(Lp)}٪ پایین‌تر`, r.n ? `${P1(r.pd / r.n)} ← ${P1(r.yd / r.n)}` : "–", "میانگین پیش‌بینی ← آنچه واقعاً شد"],
+      ["هیچ‌کدام", r.n ? `${P1(r.pn / r.n)} ← ${P1(r.yn / r.n)}` : "–", "میانگین پیش‌بینی ← آنچه واقعاً شد"],
+      ["اگر هر بار طرف قوی‌تر را می‌گرفتی", fin(tm) ? pct(tm, 2) : "–", fin(tm) ? `میانگین هر معامله روی قیمت، پس از هزینه؛ ${FA(r.tr.length)} معامله، ${P1(tw)} سودده` : "هنوز معامله‌ی تمام‌شده‌ای نیست"],
+    ];
+    const bins = `<table class="bins"><thead><tr><th>قدرت جهت پیش‌بینی‌شده</th><th class="num">تعداد</th><th class="num">جهت درست</th></tr></thead><tbody>${r.bins.map((b, i) => `<tr><th>${names[i]}</th><td class="num">${num(b[0], 0)}</td><td class="num">${b[0] >= 20 ? P1(b[1] / b[0]) : '<span class="mut">نمونه کم</span>'}</td></tr>`).join("")}</tbody></table>`;
+    box.innerHTML = `<p class="note" style="margin-bottom:10px">${wname} گذشته، برای ${FA(Lp)}٪ در ${FA(H)} ساعت. پیش‌بینی هر ساعت برای همه‌ی ارزها از روی همان کندل‌ها دوباره ساخته شده (همان عددی که آن ساعت در پنل دیده می‌شد) و با آنچه بعدش واقعاً اتفاق افتاد مقایسه شده.</p>
+      <div class="tiles">${tiles.map(([k, v, s2]) => `<div class="tile"><span class="k">${k}</span><span class="v" style="font-size:17px">${v}</span><span class="s">${s2}</span></div>`).join("")}</div>
+      <div class="grid2" style="margin-top:12px"><div>${bins}</div><p class="note">جهت پیش‌بینی‌شده‌ی قوی‌تر باید درصد درست بیشتری داشته باشد؛ اگر نداشته باشد، آن قدرت واقعی نیست. پیش‌بینی‌های پشت‌سرهم هم‌پوشانی دارند و همه‌ی ارزها با هم حرکت می‌کنند (یک حرکت بزرگ بازار چندین بار شمرده می‌شود)؛ این بخش رفتار اخیر را نشان می‌دهد، نه اثبات. هر چه بازه بلندتر و شامل بازار بالارو و پایین‌رو باشد، معتبرتر است.${r.tie ? ` در ${FA(r.tie)} مورد هر دو سطح در یک کندل زده شد.` : ""}</p></div>`;
+  }
+  function histCoin(sym) {
+    if (!HIST || !HST) return `<p class="empty">در حال ساختن سوابق…</p>`;
+    const h = S.h, l = S.l, H = D.grid.H[h], Lp = D.grid.L[l];
+    const P1 = (x) => fin(x) ? `<span class="n">${FA(Math.round(x * 100))}٪</span>` : "–";
+    const sumLine = (w, name) => {
+      const c = stats(h, l, w).coins[sym];
+      if (!c) return `<span>${name}</span><span class="mut">داده نیست</span>`;
+      const d = c.n ? `جهت <b class="n">${FA(c.ok)}</b> از <span class="n">${FA(c.n)}</span> بار درست${c.n < 5 ? ' <span class="mut">(نمونه کم)</span>' : ""}` : "هیچ سطحی زده نشد";
+      const tch = c.done ? ` · رسیدن به بالا ${P1(c.pu / c.done)} ← ${P1(c.yu / c.done)} · پایین ${P1(c.pd / c.done)} ← ${P1(c.yd / c.done)}` : "";
+      return `<span>${name}</span><span>${d}${tch}</span>`;
+    };
+    const summary = `<div class="kv" style="margin-bottom:8px">${sumLine(48, "۴۸ ساعت گذشته")}${sumLine(168, "۱ هفته")}${sumLine(336, "۲ هفته")}</div>`;
+    const step = H <= 4 ? 1 : H <= 12 ? 2 : H <= 24 ? 3 : 6, picks = [];
+    for (let i = HIST.length - 1; i >= 0 && picks.length < 24; i -= step) picks.push(HIST[i]);
+    const rows = picks.map((sn) => {
+      const p = sn.coins[sym];
+      if (!p) return "";
+      const o = window.Live.outcome(HST, sym, sn.t, H, Lp);
+      if (!o) return "";
+      const q = p.q[h][l], fav = q >= 0.5 ? "up" : "dn";
+      let res;
+      if (o.first === "up" || o.first === "dn") {
+        const ok = o.first === fav;
+        res = `${o.first === "up" ? "اول بالا" : "اول پایین"} <span class="pill ${ok ? "pos" : "neg"}">${ok ? "جهت درست" : "جهت غلط"}</span>`;
+      } else if (o.first === "tie") res = `<span class="pill warn">هر دو در یک کندل</span>`;
+      else if (o.first === "none") res = `<span class="mut">هیچ‌کدام</span>`;
+      else res = `<span class="mut">در جریان (${FA(o.elapsed)} از ${FA(H)} ساعت)</span>`;
+      return `<tr><td>${tfd(sn.ts + 3600000)}</td><td class="num">${price(p.c)}</td><td class="num">بالا ${P0(p.up[h][l])} · پایین ${P0(p.dn[h][l])}</td><td class="num">${dirCompact(q)}</td><td>${res}</td><td class="num">${pct(o.ret, 1)}${o.done ? "" : ' <span class="note">تا الان</span>'}</td><td class="num">${pct(o.mx, 1)} / ${pct(o.mn, 1)}</td></tr>`;
+    }).join("");
+    return `${summary}<div class="tbl"><table class="ht"><thead><tr><th>کندل (تهران)</th><th class="num">قیمت آن موقع</th><th class="num">پیش‌بینی رسیدن</th><th class="num">جهت</th><th>نتیجه</th><th class="num">تغییر تا پایان مدت</th><th class="num">بیشترین بالا / پایین</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="note" style="margin-top:6px">${step > 1 ? `هر ${FA(step)} ساعت یک ردیف، تا ردیف‌های قدیمی‌تر مدتشان تمام شده باشد. ` : ""}«جهت درست» یعنی سطحی که اول زده شد همان جهت قوی‌تر پیش‌بینی بود. «بیشترین بالا / پایین» بیشترین فاصله‌ای است که قیمت در آن مدت از قیمت آن موقع رفت.</p>`;
+  }
+  function valYears() {
+    const m = /(\d{4})-\d{2} \.\. (\d{4})-\d{2}/.exec((D.model && D.model.validation) || "");
+    return m ? `${FA(m[1])} تا ${FA(m[2])}` : "۲۰۲۴ تا ۲۰۲۶";
+  }
+  function modelDate() {
+    const m = /\.\. (\d{4})-(\d{2})-(\d{2})/.exec((D.model && D.model.trained) || "");
+    return m ? FA(`${m[3]}/${m[2]}`) : null;
+  }
+  function renderAll() {
+    controls(); regime(); table(); detail(); score(); hist();
+    const gen = new Date(D.generated), asof = new Date(D.asof_ms + 3600000);
+    const tf = (d) => FA(d.toLocaleString("en-GB", { timeZone: "Asia/Tehran", hour12: false, day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }));
+    $("meta").innerHTML = `محاسبه‌ی سرور <span class="n">${tf(gen)}</span> تهران · داده تا <span class="n">${tf(asof)}</span> · <span class="pill">${FA(D.coins.length)} ارز</span>${modelDate() ? ` · <span title="مدل هر هفته با داده‌ی تازه دوباره آموزش می‌بیند؛ پنجره‌ی آموزش ۴ سال اخیر است.">مدل آموزش‌دیده با داده‌ی تا <span class="n">${modelDate()}</span></span>` : ""}`;
+  }
+  function show() {
+    const p = prefs.get();
+    for (const k of ["h", "l", "x", "dir", "hw"]) if (fin(p[k])) S[k] = p[k];
+    if (p.sort) S.sort = p.sort === "q" ? "dir" : p.sort; if (p.ft) S.ft = p.ft;
+    S.h = Math.min(S.h, D.grid.H.length - 1); S.l = Math.min(S.l, D.grid.L.length - 1); S.x = Math.min(S.x, LEV.length - 1);
+    const tiers = [...new Set(D.coins.map((c) => c.tier))];
+    $("tier").innerHTML = '<option value="">همه</option>' + tiers.map((t) => `<option>${esc(t)}</option>`).join("");
+    $("lock").hidden = true; $("app").hidden = false; renderAll();
+    liveRefresh(false);
+  }
+
+  $("t").addEventListener("click", (e) => {
+    const th = e.target.closest("th.s");
+    if (th) { const k = th.dataset.k; S.dir = k === S.sort ? -S.dir : (k === "sym" ? 1 : -1); S.sort = k; save(); table(); return; }
+    const tr = e.target.closest("tr[data-s]");
+    if (tr) { S.sel = tr.dataset.s === S.sel ? null : tr.dataset.s; table(); detail(); if (S.sel) $("detail").scrollIntoView({ behavior: "smooth", block: "start" }); }
+  });
+  $("t").addEventListener("keydown", (e) => { if (e.key === "Enter") e.target.click(); });
+  $("q").addEventListener("input", table);
+  $("tier").addEventListener("change", table);
+  $("out").addEventListener("click", () => { store.del(); D = null; KEY = null; SEED = null; $("app").hidden = true; $("lock").hidden = false; $("pw").value = ""; });
+
+
+  /* ---------- محاسبه‌ی زنده: کندل‌های تازه از OKX (در مرورگر) ---------- */
+  const tfh = (ms) => FA(new Date(ms).toLocaleString("en-GB", { timeZone: "Asia/Tehran", hour12: false, hour: "2-digit", minute: "2-digit" }));
+  function setLive(kind, text) {
+    const el = $("live");
+    el.hidden = !text; el.textContent = text || "";
+    el.className = "pill" + (kind ? " " + kind : "");
+  }
+  async function loadSeed() {
+    const r = await fetch("seed.enc.json?t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) throw new Error("seed http " + r.status);
+    const b = await r.json();
+    const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64d(b.iv) }, KEY, b64d(b.ct));
+    let text;
+    if (b.gz) text = await new Response(new Blob([pt]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+    else text = dec.decode(pt);
+    SEED = JSON.parse(text); seedAt = Date.now();
+    return SEED;
+  }
+  async function liveRefresh(manual) {
+    if (busy || !D || !KEY || !window.Live) return;
+    busy = true; $("rf").disabled = true; $("rf").textContent = "در حال دریافت…";
+    setLive("", "در حال دریافت از OKX…");
+    try {
+      if (Date.now() - srvAt > (manual ? 10 : 30) * 60000) { blob = await load(); D = await open(KEY); srvAt = Date.now(); SEED = null; }
+      if (!SEED) await loadSeed();
+      const out = await window.Live.update(SEED);
+      const info = out.info;
+      LST = out.st; setTimeout(buildHist, 30);
+      if (!info.live) { setLive("warn", "OKX از این دستگاه در دسترس نیست؛ آخرین محاسبه‌ی سرور"); renderAll(); return; }
+      const by = {};
+      for (const c of D.coins) by[c.sym] = c;
+      for (const n of out.res.coins) { const o = by[n.sym]; if (!o) continue; const d = o.d; Object.assign(o, n); o.d = d; }
+      for (const c of D.coins) {
+        c.px = fin(out.px[c.sym]) ? out.px[c.sym] : null;
+        const o = out.o24 ? out.o24[c.sym] : null;
+        c.chg24c = c.chg24;
+        if (fin(c.px) && fin(o) && o > 0) { c.chg24 = (c.px / o - 1) * 100; c.chg24live = true; } else c.chg24live = false;
+      }
+      D.market = out.res.market; D.asof_ms = out.res.asof_ms;
+      lastLive = Date.now();
+      renderAll();
+      if (info.errors > 0 && info.fetched === 0) setLive("warn", "کندل‌های تازه دریافت نشد؛ قیمت زنده است ولی احتمال‌ها قدیمی‌اند");
+      else if (info.errors > 0) setLive("warn", `زنده · ${FA(info.errors)} ارز کندل تازه نگرفت · داده تا ${tfh(D.asof_ms + 3600000)}`);
+      else setLive("pos", `زنده · احتمال‌ها تا کندل ${tfh(D.asof_ms + 3600000)} تهران`);
+    } catch (e) {
+      setLive("warn", "به‌روزرسانی زنده انجام نشد؛ آخرین محاسبه‌ی سرور");
+      if (manual) console.error(e);
+      try { if (SEED && !LST) { LST = window.Live.prepare(SEED); setTimeout(buildHist, 30); } } catch (e2) {}
+    } finally { busy = false; $("rf").disabled = false; $("rf").textContent = "به‌روزرسانی"; }
+  }
+  $("rf").addEventListener("click", () => liveRefresh(true));
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && D && Date.now() - lastLive > 5 * 60000) liveRefresh(false); });
+  window.addEventListener("online", () => { if (D) liveRefresh(false); });
+
+  $("f").addEventListener("submit", async (e) => {
+    e.preventDefault(); $("err").textContent = ""; $("go").disabled = true; $("go").textContent = "در حال باز کردن…";
+    try {
+      blob = blob || await load();
+      const key = await derive($("pw").value);
+      KEY = key;
+      D = await open(key); srvAt = Date.now();
+      if ($("rem").checked) store.set({ salt: blob.salt, k: b64e(await crypto.subtle.exportKey("raw", key)) });
+      show();
+    } catch (err) {
+      $("err").textContent = err && err.name === "OperationError" ? "رمز عبور درست نیست." : "داده دریافت نشد. اتصال را بررسی کن.";
+    } finally { $("go").disabled = false; $("go").textContent = "باز کردن"; }
+  });
+
+  (async () => {
+    const saved = store.get();
+    if (!saved) return;
+    try {
+      blob = await load();
+      if (saved.salt !== blob.salt) { store.del(); return; }
+      const key = await crypto.subtle.importKey("raw", b64d(saved.k), { name: "AES-GCM" }, false, ["decrypt"]);
+      KEY = key;
+      D = await open(key); srvAt = Date.now(); show();
+    } catch (e) { store.del(); }
+  })();
+})();
+</script>
+</body>
+</html>
